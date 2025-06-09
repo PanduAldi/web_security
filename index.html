@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Web Security Workshop: PHP, Laravel & CodeIgniter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #181A21;
+      --card: #232537;
+      --headline: #f7fafc;
+      --primary: #5ad8ff;
+      --sub: #8aadf7;
+      --desc: #b7c2da;
+      --border: #2a2d3e;
+      --laravel: #fb4d56;
+      --ci: #ffe066;
+      --shadow: 0 8px 32px 0 rgba(67,112,195,0.12);
+      --panel-accent: #1e2130;
+      --ok: #61e396;
+      --danger: #ff9892;
+      --cta: #10182a;
+    }
+    html, body {
+      margin:0; padding:0;
+      width: 100vw; height: 100vh;
+      background: var(--bg); color: var(--headline);
+      font-family: 'Inter', Arial, sans-serif;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    body {
+      min-height: 100vh; width: 100vw; min-width: 0;
+      display: flex; align-items:center; justify-content: center;
+    }
+    .slide-viewport {
+      width: 100vw; height: 100vh;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+    }
+    .slide {
+      position: absolute; left: 0; top: 0; width: 100vw; height:100vh;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      background: var(--bg);
+      transition: opacity .35s;
+    }
+    .slide.active { display: flex; animation:fadein .8s;}
+    @keyframes fadein { from{opacity:0; transform:translateY(36px);} to{opacity:1;transform:translateY(0);} }
+    .panel {
+      background: var(--card);
+      border-radius: 1em;
+      padding: 3.1rem 3.1rem 2rem 3.1rem;
+      box-shadow: var(--shadow);
+      min-width: 320px; max-width: 720px; width: 98vw;
+      border: 1.5px solid var(--border);
+      margin: 0 auto;
+      display: flex; flex-direction: column; align-items: flex-start;
+      position: relative;
+    }
+    h1 {
+      font-size: 2.7rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin: 0 0 0.6em 0;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+    }
+    h2 {
+      font-size: 2.16rem;
+      font-weight: 800;
+      color: var(--sub);
+      margin: 0 0 0.3em 0;
+      line-height: 1.19;
+      letter-spacing: -.011em;
+    }
+    .desc,.slide-caption { color: var(--desc); margin:.9em 0 0.23em .07em; font-size:1.17em;}
+    ul,ol {color:var(--desc); font-size: 1.17rem; margin:.24em 0 1.25em 0.6em; padding: 0 0 0 1.3em;}
+    li {margin-bottom:.49em;}
+    .card {
+      background: var(--panel-accent);
+      border-radius: 0.66rem;
+      box-shadow:0 1.5px 15px #19213552;
+      font-size:1.13rem;
+      color:var(--headline);
+      margin:1.2em 0 .78em 0;
+      padding:1.21em 1.28em;
+      border:1.5px solid var(--border);
+      text-align:center;
+      font-weight:600;
+    }
+    .slide-num {
+      color: var(--sub);
+      background: none;
+      font-size: 1.02rem; letter-spacing: 0.09em;
+      user-select: none;
+      position: absolute; right: 3.1rem; bottom: 1.2rem;
+      opacity:0.5; z-index: 2;
+      padding:0.12em 0.8em; border-radius:1.6em;
+    }
+    .slide-nav {
+      position: absolute; left: 0; right: 0; bottom: 2.2rem;
+      display: flex; justify-content: center; gap: 2.4em;
+      z-index: 10; pointer-events:none;
+    }
+    .slide-nav-btn {
+      background: var(--cta);
+      color: #fff;
+      padding: .82rem 2.34rem;
+      font-size: 1.13rem;
+      font-weight: 700;
+      border: none; border-radius: 2em;
+      pointer-events: auto;
+      cursor: pointer;
+      opacity:.94;
+      box-shadow: 0 8px 48px #2658ad18;
+      transition: background .18s, opacity .19s;
+    }
+    .slide-nav-btn[disabled] {background: #33384b;color: #74778a;opacity:.62;cursor:not-allowed;box-shadow:none;}
+    .slide-nav-btn:not([disabled]):hover,
+    .slide-nav-btn:not([disabled]):focus {background: var(--primary);color:#111234;outline:none;opacity:1;}
+    .case-flex {
+      display: flex; flex-wrap:wrap; gap:1.5rem; margin-bottom:1.7em;
+      width: 100%; justify-content: flex-start;
+    }
+    .case-block {
+      background: #191d2a;
+      border-radius: 0.66em;
+      box-shadow: 0 1.5px 7px #19253533;
+      border: 1px solid #22283e;
+      min-width: 200px; max-width: 330px; flex:1 1 220px;
+      margin-bottom: .7em;
+      display: flex; flex-direction: column; align-items: flex-start;
+      padding: .59em 1em .89em 1.09em;
+    }
+    .framework-label {
+      font-size: 1em; font-weight: 900; padding:.03em .56em; border-radius:.33em; margin-right:.33em; letter-spacing:.07em;
+      background: #242e4d91;
+      color: var(--laravel);
+    }
+    .framework-label.ci {color: var(--ci);}
+    .framework-label.good {background:#1d312b;color:var(--ok);}
+    .framework-label.bad {background:#2b191a;color:var(--danger);}
+    .case-block .code-title {font-size:.97em; color:var(--primary); font-weight:600; margin:0.4em 0 0.21em 0;}
+    pre, code {
+      background: #1a2131 !important; color: #93ffe0;
+      font-family: 'Fira Mono','Consolas',monospace;
+      font-size: 1em; padding:0.28em 0.7em; border-radius:0.37em;
+      margin:0.28em 0 0.92em 0 !important; border:none; line-height:1.46; overflow-x:auto; width:100%; box-sizing:border-box;
+    }
+    code.inline {display:inline; padding:0.08em 0.39em; background: #212a38; color: var(--primary); border-radius:0.29em; font-size:.98em;}
+    @media (max-width: 950px) {.panel{padding:2.3rem 0.6rem;} h1{font-size:2.18rem;} .case-flex{gap:.8em;} .case-block{font-size:.93em;}}
+    @media (max-width: 540px) {.panel{padding:1.1em .18em;} h1{font-size:1.28rem;} .case-flex{flex-direction:column;} .case-block{max-width:99vw;}}
+  </style>
+</head>
+<body>
+<div class="slide-viewport">
+
+  <!-- 1: JUDUL -->
+  <div class="slide active" id="slide-0" tabindex="0">
+    <div class="panel">
+      <h1>Web Security:<br>Secure Coding &amp; Deployment<br> pada PHP </h1>
+      <div class="desc"> — <strong>[Pandu Aldi Pratama]</strong> —</div>
+      <div class="card" style="font-weight:600;">
+        Brebes, 10 Juni 2025
+      </div>
+      <button class="slide-nav-btn" id="heroNext" style="margin-top:2.0em;">Mulai</button>
+      <span class="slide-num">1 / 16</span>
+    </div>
+  </div>
+
+  <!-- 2: AGENDA -->
+  <div class="slide" id="slide-1" tabindex="0">
+    <div class="panel">
+      <h2>Apa yang akan kita Bahas ???</h2>
+      <ul>
+        <li>Celah Umum &amp; Studi Kasus Laravel &amp; CI</li>
+        <li>Input/Output &amp; XSS</li>
+        <li>SQL Injection</li>
+        <li>CSRF</li>
+        <li>Session &amp; Cookie Security</li>
+        <li>Upload File Aman</li>
+        <li>.htaccess, Security Headers &amp; .git</li>
+        <li>Deployment: NGINX, Structure, Permissions</li>
+        <li>Backup, Patch, Q&amp;A</li>
+      </ul>
+      <div class="card">Hands-on praktik, studi kasus, perbandingan framework!</div>
+      <span class="slide-num">2 / 16</span>
+    </div>
+  </div>
+
+  <!-- 3: Celah Umum Keamanan Web -->
+  <div class="slide" id="slide-2" tabindex="0">
+    <div class="panel">
+      <h2>Celah Umum Keamanan Web</h2>
+      <ul>
+        <li><b>XSS (Cross-Site Scripting):</b> Input/output web bisa disisipkan script, pencurian session/cookie.</li>
+        <li><b>SQL Injection:</b> Input user memanipulasi query DB, bisa bocor/manipulasi data.</li>
+        <li><b>CSRF (Cross-Site Request Forgery):</b> User yang login dipancing melakukan aksi tanpa sadar.</li>
+        <li><b>File Upload:</b> Upload shell/file berbahaya, bisa eksekusi server.</li>
+        <li><b>Exposure .env/.git:</b> Credential, rahasia, source code bocor ke publik.</li>
+        <li><b>Deployment Misconfig:</b> Hak akses/permission, update, atau security header gagal di-set.</li>
+      </ul>
+      <div class="card">Setiap celah ini akan dijawab dengan studi kasus & solusi di framework!</div>
+      <span class="slide-num">3 / 16</span>
+    </div>
+  </div>
+
+  <!-- Slide 4-17: ... (Isi seperti struktur full dark-themed yang diberikan sebelumnya) -->
+  <!-- Copy/Paste dari jawaban full dark theme sebelum ini, ganti id & slide-num:
+      id="slide-3" ... slide-num">4/17</span>
+      dst
+  -->
+  <!-- === SLIDE 4: XSS Laravel & CI === -->
+  <div class="slide" id="slide-3" tabindex="0">
+    <div class="panel">
+      <h2>Studi Kasus Input/Output: XSS</h2>
+      <div class="case-flex">
+        <div class="case-block"><span class="framework-label">Laravel</span>
+          <span class="framework-label good">SAFE</span>
+          <pre>Hello, {{ request('nama') }}
+$nama = $request->validate(['nama'=>'required|string|max:100'])['nama'];</pre>
+          <span class="framework-label bad">BAD!</span>
+          <pre>Hello, {!! $_GET['nama'] !!}</pre>
+        </div>
+        <div class="case-block"><span class="framework-label ci">CodeIgniter</span>
+          <span class="framework-label good">SAFE</span>
+          <pre>Hello, <?= esc($this->input->get('nama')) ?>
+$nama = $this->request->getVar('nama', FILTER_SANITIZE_SPECIAL_CHARS);</pre>
+          <span class="framework-label bad">BAD!</span>
+          <pre>Hello, &lt;?= $_GET['nama'] ?&gt;</pre>
+        </div>
+      </div>
+      <div class="card">Blade &amp; esc() = auto XSS-protect. Hindari {!! !!} (Laravel) &amp; <?= ... ?> tanpa esc() (CI)</div>
+      <span class="slide-num">4 / 16</span>
+    </div>
+  </div>
+  <!-- (Selanjutnya lanjutkan numbering +1 pada setiap id & slide-num) -->
+  <div class="slide" id="slide-4" tabindex="0">
+    <div class="panel">
+      <h2>Studi Kasus SQL Injection</h2>
+      <div class="case-flex">
+        <div class="case-block"><span class="framework-label">Laravel</span>
+          <span class="framework-label good">SAFE</span>
+<pre>$validated = $request->validate(['email'=>'required|email']);
+$user = DB::table('users')->where('email', $validated['email'])->first();
+User::where('email', $validated['email'])->first();</pre>
+          <span class="framework-label bad">BAD!</span>
+<pre>$users = DB::select("SELECT * FROM users WHERE email = '{$_GET['email']}'");</pre>
+        </div>
+        <div class="case-block"><span class="framework-label ci">CodeIgniter</span>
+          <span class="framework-label good">SAFE</span>
+<pre>$email = $this->request->getVar('email');
+$user = $db->table('users')->getWhere(['email' => $email])->getRow();</pre>
+          <span class="framework-label bad">BAD!</span>
+<pre>$email = $_GET['email'];
+$query = $this->db->query("SELECT * FROM users WHERE email = '$email'");</pre>
+        </div>
+      </div>
+      <div class="card">Query Builder/Eloquent + validasi input, JANGAN raw SQL!</div>
+      <span class="slide-num">5 / 16</span>
+    </div>
+  </div>
+  <div class="slide" id="slide-5" tabindex="0">
+    <div class="panel">
+      <h2>Studi Kasus CSRF Protection</h2>
+      <div class="case-flex">
+        <div class="case-block"><span class="framework-label">Laravel</span>
+          <pre>
+&lt;form method="POST"&gt;
+  @csrf
+&lt;/form&gt;</pre>
+        </div>
+        <div class="case-block"><span class="framework-label ci">CodeIgniter 4</span>
+<pre>
+&lt;form method="post"&gt;
+  <?= csrf_field() ?>
+&lt;/form&gt;
+// Config: 'csrf_protection' => true
+</pre>
+        </div>
+      </div>
+      <div class="card">Laravel: @csrf — CI: csrf_field() — <b>Wajib semua form penting!</b></div>
+      <span class="slide-num">6 / 16</span>
+    </div>
+  </div>
+  <div class="slide" id="slide-6" tabindex="0">
+    <div class="panel">
+      <h2>Studi Kasus Session &amp; Cookie</h2>
+      <div class="case-flex">
+        <div class="case-block"><span class="framework-label">Laravel</span>
+<pre>'http_only' => true,
+'secure' => env('SESSION_SECURE_COOKIE', true),
+Auth::logout();
+$request->session()->invalidate();</pre>
+        </div>
+        <div class="case-block"><span class="framework-label ci">CodeIgniter 4</span>
+<pre>'cookieSecure' => true,
+'sessionCookieName' => 'ci_session',
+'sessionExpiration' => 7200,
+session()->destroy();</pre>
+        </div>
+      </div>
+      <div class="card">Cookie secure, hapus session di logout, XSS/Session hijack = nyata!</div>
+      <span class="slide-num">7 / 16</span>
+    </div>
+  </div>
+  <div class="slide" id="slide-7" tabindex="0">
+    <div class="panel">
+      <h2>Studi Kasus Upload File</h2>
+      <div class="case-flex">
+        <div class="case-block"><span class="framework-label">Laravel</span>
+<pre>$validated = $request->validate([
+  'avatar'=>'required|image|mimes:jpg,jpeg,png|max:2048'
+]);
+$path = $request->file('avatar')->store('avatars', 'public');</pre>
+        </div>
+        <div class="case-block"><span class="framework-label ci">CodeIgniter 4</span>
+<pre>$file = $this->request->getFile('avatar');
+if ($file->isValid() && !$file->hasMoved() &&
+    in_array($file->getClientExtension(), ['jpg','png','jpeg']) &&
+    $file->getSize() < 2*1024*1024) {
+  $file->move(WRITEPATH . 'uploads');
+}</pre>
+        </div>
+      </div>
+      <div class="card">Validasi tipe/ukuran, simpan di folder non-public, upload shell dilarang!</div>
+      <span class="slide-num">8 / 16</span>
+    </div>
+  </div>
+  <div class="slide" id="slide-8" tabindex="0">
+    <div class="panel">
+      <h2>.htaccess, Header, .git, .env Block</h2>
+      <div class="case-flex">
+        <div class="case-block"><span class="framework-label">Laravel</span>
+<pre>
+&lt;FilesMatch "\.(env|git|ht|svn|DS_Store)"&gt;
+  Order allow,deny
+  Deny from all
+&lt;/FilesMatch&gt;
+RewriteCond %{REQUEST_URI} ^/\.git [NC]
+RewriteRule .* - [F,L]
+Header set X-Frame-Options "SAMEORIGIN"
+Header set Content-Security-Policy "default-src 'self';"
+</pre>
+        </div>
+        <div class="case-block"><span class="framework-label ci">CodeIgniter</span>
+<pre>
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/\.git [NC]
+RewriteRule .* - [F,L]
+&lt;FilesMatch "\.(env|git|ht|svn|DS_Store)"&gt;
+Order allow,deny
+Deny from all
+&lt;/FilesMatch&gt;
+Header set X-Frame-Options "SAMEORIGIN"
+Header set Content-Security-Policy "default-src 'self';"
+</pre>
+        </div>
+      </div>
+      <div class="card">Akses /.git/.env = harus 403 Forbidden (block public)!</div>
+      <span class="slide-num">9 / 16</span>
+    </div>
+  </div>
+  <div class="slide" id="slide-9" tabindex="0">
+    <div class="panel">
+      <h2>Deployment Aman: NGINX &amp; Permission</h2>
+      <div class="case-flex">
+        <div class="case-block"><span class="framework-label">NGINX</span>
+<pre>server {
+  listen 80;
+  server_name yourdomain.com www.yourdomain.com;
+  return 301 https://$host$request_uri;
+}
+server {
+  listen 443 ssl;
+  ssl_certificate /etc/letsencrypt/live/…;
+  ssl_certificate_key /etc/letsencrypt/live/…;
+  client_max_body_size 2M;
+  location ~ /\.(env|git|ht|svn|DS_Store) { deny all; }
+  add_header X-Frame-Options "SAMEORIGIN";
+}</pre>
+        </div>
+        <div class="case-block"><span class="framework-label">PERMISSION</span>
+<pre>
+public_html/       # asset/index.php
+app/               # code, config
+uploads/           # file upload
+$ chmod -R 755 public_html
+$ chown -R www-data:www-data .
+</pre>
+        </div>
+      </div>
+      <div class="card">Struktur folder, permission, block file sensitif, deployment = <b>wajib benar!</b></div>
+      <span class="slide-num">10 / 16</span>
+    </div>
+  </div>
+  <div class="slide" id="slide-10" tabindex="0">
+    <div class="panel">
+      <h2>.env &amp; Credential Management</h2>
+      <div class="case-flex">
+        <div class="case-block"><span class="framework-label">.env</span>
+<pre>DB_HOST=localhost
+DB_USER=myuser
+DB_PASS=mysecret
+
+// Laravel
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();</pre>
+        </div>
+        <div class="case-block"><span class="framework-label">Tips</span>
+          <ul>
+            <li>.env wajib di .gitignore</li>
+            <li>Jangan pernah upload credential ke repo</li>
+            <li>File .env dan /.git harus tidak bisa diakses publik</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">Credential = kunci web, jangan bocor/env public!</div>
+      <span class="slide-num">11 / 16</span>
+    </div>
+  </div>
+  <div class="slide" id="slide-11" tabindex="0">
+    <div class="panel">
+      <h2>Backup &amp; Log Monitoring</h2>
+      <div class="case-flex">
+        <div class="case-block"><span class="framework-label">Backup</span>
+<pre>
+0 2 * * * mysqldump -u root -pPASS dbname | gzip > /backup/db_$(date +\%F).sql.gz
+</pre>
+        </div>
+        <div class="case-block"><span class="framework-label">Log Monitor</span>
+          <ul>
+            <li>Monitor error &amp; access log rutin</li>
+            <li>Buat notifikasi anomali</li>
+            <li>Simulasi restore backup</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">Backup terjadwal, audit log, audit keamanan = pondasi anti disaster</div>
+      <span class="slide-num">12 / 16</span>
+    </div>
+  </div>
+  <div class="slide" id="slide-12" tabindex="0">
+    <div class="panel">
+      <h2>Patch &amp; Dependency Update</h2>
+      <div class="case-flex">
+        <div class="case-block"><span class="framework-label">Composer</span>
+<pre>composer show --outdated
+composer update
+composer audit</pre>
+        </div>
+        <div class="case-block"><span class="framework-label">Tips</span>
+          <ul>
+            <li>Jangan gunakan library tua/tak dipelihara</li>
+            <li>Buat stage sebelum prod untuk update dependency</li>
+            <li>Pakai tools security advisory</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">Dependency lama = pintu hacker selalu terbuka!</div>
+      <span class="slide-num">13 / 16</span>
+    </div>
+  </div>
+  <div class="slide" id="slide-13" tabindex="0">
+    <div class="panel">
+      <h2>Hacked → Hardened</h2>
+      <ul>
+        <li>XSS, SQLi, upload shell di dev.
+            <pre>
+🔧 1. Simulasi Serangan (Pentest Internal)
+Melakukan uji coba eksploitasi pada lingkungan dev/testing,
+bukan production:
+XSS (Cross-Site Scripting)
+→ Coba input &lt;script&gt;alert(1)&lt;/script&gt; pada kolom form.
+SQLi (SQL Injection)
+→ Input ' OR 1=1-- untuk mencoba bypass login atau query data.
+Upload Shell
+→ Upload file seperti shell.php atau .php5 lalu akses via browser 
+untuk uji eksekusi.
+Tujuan: Mendeteksi titik lemah sebelum ditemukan oleh 
+hacker sebenarnya.
+            </pre>
+        </li>
+        <li>Fix dengan materi best-practice. Tes ulang sampai aman.</li>
+      </ul>
+      <div class="card">Audit, perbaiki, audit lagi — aplikasi jadi kuat.</div>
+      <span class="slide-num">14 / 16</span>
+    </div>
+  </div>
+
+  <div class="slide" id="slide-15" tabindex="0">
+    <div class="panel">
+      <h2>Penutup &amp; Takeaways</h2>
+      <ul>
+        <li>Nyaman  != Aman!!</li>
+        <li>Security = proses panjang dan terus-menerus</li>
+        <li>Audit, patch, dan monitor aplikasi Anda</li>
+        <li>Stay curious, stay secure! 🔒</li>
+      </ul>
+      <div class="card">Terima kasih — sampai jumpa di kesempatan selanjutnya!</div>
+      <span class="slide-num">16 / 16</span>
+    </div>
+  </div>
+
+  <div class="slide-nav">
+    <button class="slide-nav-btn" id="prevBtn" aria-label="Sebelumnya">Sebelumnya</button>
+    <button class="slide-nav-btn" id="nextBtn" aria-label="Selanjutnya">Selanjutnya</button>
+  </div>
+</div>
+<script>
+const slides = Array.from(document.querySelectorAll('.slide'));
+let curr = 0;
+function showSlide(i) {
+  slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+  curr = i;
+  prevBtn.disabled = curr === 0;
+  nextBtn.disabled = curr === slides.length - 1;
+  slides[curr].focus();
+}
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+prevBtn.onclick = () => { if(curr > 0) showSlide(curr-1); };
+nextBtn.onclick = () => { if(curr < slides.length-1) showSlide(curr+1); };
+document.getElementById('heroNext').onclick = () => showSlide(1);
+document.addEventListener('keydown', e => {
+  if ((e.key === "ArrowRight" || e.key === "PageDown") && curr < slides.length-1) showSlide(curr+1);
+  if ((e.key === "ArrowLeft" || e.key === "PageUp") && curr > 0) showSlide(curr-1);
+});
+showSlide(0);
+document.body.style.overflow='hidden';
+document.documentElement.style.overflow='hidden';
+window.addEventListener('resize', () => { window.scrollTo(0,0); });
+</script>
+</body>
+</html>
