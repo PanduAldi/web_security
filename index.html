@@ -28,8 +28,7 @@
       background: var(--bg); color: var(--headline);
       font-family: 'Inter', Arial, sans-serif;
       box-sizing: border-box;
-      overflow: hidden;
-    }
+      }
     body {
       min-height: 100vh; width: 100vw; min-width: 0;
       display: flex; align-items:center; justify-content: center;
@@ -101,7 +100,7 @@
     }
     .slide-nav {
       position: absolute; left: 0; right: 0; bottom: 2.2rem;
-      display: flex; justify-content: center; gap: 2.4em;
+      display: flex; justify-content: center; gap: 100.4em;
       z-index: 10; pointer-events:none;
     }
     .slide-nav-btn {
@@ -166,7 +165,7 @@
         Brebes, 12 Juni 2025
       </div>
       <button class="slide-nav-btn" id="heroNext" style="margin-top:2.0em;">Mulai</button>
-      <span class="slide-num">1 / 15</span>
+      <span class="slide-num"></span>
     </div>
   </div>
 
@@ -177,7 +176,7 @@
       <ul>
         <li>Celah Umum Website</li>
         <li>Input/Output &amp; XSS</li>
-        <li>SQL Injection</li>
+        <li>IDOR (Insecure Direct Object Reference)</li>
         <li>CSRF</li>
         <li>Session &amp; Cookie Security</li>
         <li>Upload File Aman</li>
@@ -186,7 +185,7 @@
         <li>Backup, Patch</li>
       </ul>
       <div class="card">Hands-on praktik, studi kasus, perbandingan framework!</div>
-      <span class="slide-num">2 / 15</span>
+      <span class="slide-num"></span>
     </div>
   </div>
 
@@ -194,6 +193,7 @@
   <div class="slide" id="slide-2" tabindex="0">
     <div class="panel">
       <h2>Celah Umum Website</h2>
+      
       <ul>
         <li><b>XSS (Cross-Site Scripting):</b> Input/output web bisa disisipkan script, pencurian session/cookie.</li>
         <li><b>SQL Injection:</b> Input user memanipulasi query DB, bisa bocor/manipulasi data.</li>
@@ -203,9 +203,36 @@
         <li><b>Deployment Misconfig:</b> Hak akses/permission, update, atau security header gagal di-set.</li>
       </ul>
       <div class="card">Setiap celah ini akan dijawab dengan studi kasus & solusi di framework!</div>
-      <span class="slide-num">3 / 15</span>
+      <span class="slide-num"></span>
     </div>
   </div>
+
+    <!-- 3: Celah Umum Keamanan Web -->
+  <div class="slide" id="slide-51" tabindex="0">
+    <div class="panel">
+      <h2>XSS</h2>
+      <div class="card">
+        XSS adalah serangan di mana penyerang menyisipkan skrip berbahaya (biasanya JavaScript) ke dalam halaman web yang akan dijalankan di browser pengguna lain.
+      </div>
+      <ul>
+        <li>Mencuri cookie/session</li>
+        <li>Menampilkan popup phishing</li>
+        <li>Redirect ke situs berbahaya</li>
+        <li>Mengambil kendali akun pengguna</li>
+      </ul>
+      <span class="slide-num"></span>
+    </div>
+  </div>
+
+  <!-- SLIDE FLOW IDOR -->
+<div class="slide" id="slide-5" tabindex="0">
+  <div class="panel">
+    <h2></h2>
+    <img src="./xss.png" alt="Flow Alur Serangan IDOR" style="width:100%; height:auto;">
+    <p style="text-align:center;">Serangan XSS terjadi ketika penyerang memasukkan kode jahat ke input yang kemudian diproses dan dieksekusi di browser pengguna lain yang mengunjungi website tersebut</p>
+    <span class="slide-num"></span>
+  </div>
+</div>
 
   <!-- Slide 4-17: ... (Isi seperti struktur full dark-themed yang diberikan sebelumnya) -->
   <!-- Copy/Paste dari jawaban full dark theme sebelum ini, ganti id & slide-num:
@@ -215,8 +242,11 @@
   <!-- === SLIDE 4: XSS Laravel & CI === -->
   <div class="slide" id="slide-3" tabindex="0">
     <div class="panel">
-      <h2>Studi Kasus Input/Output: XSS</h2>
+      <h2>Studi kasus XSS</h2>
+
+  
       <div class="case-flex">
+
         <div class="case-block"><span class="framework-label">Laravel</span>
           <span class="framework-label good">SAFE</span>
           <pre>Hello, {{ request('nama') }}
@@ -232,36 +262,130 @@ $nama = $this->request->getVar('nama', FILTER_SANITIZE_SPECIAL_CHARS);</pre>
           <pre>Hello, &lt;?= $_GET['nama'] ?&gt;</pre>
         </div>
       </div>
-      <div class="card">Blade &amp; esc() = auto XSS-protect. Hindari {!! !!} (Laravel) &amp; <?= ... ?> tanpa esc() (CI)</div>
-      <span class="slide-num">4 / 15</span>
+      <div class="card">
+              
+        Blade &amp; esc() = auto XSS-protect. Hindari {!! !!} (Laravel) &amp; <?= ... ?> tanpa esc() (CI)</div>
+      <span class="slide-num"></span>
     </div>
   </div>
-  <!-- (Selanjutnya lanjutkan numbering +1 pada setiap id & slide-num) -->
-  <div class="slide" id="slide-4" tabindex="0">
-    <div class="panel">
-      <h2>Studi Kasus SQL Injection</h2>
-      <div class="case-flex">
-        <div class="case-block"><span class="framework-label">Laravel</span>
-          <span class="framework-label good">SAFE</span>
-<pre>$validated = $request->validate(['email'=>'required|email']);
-$user = DB::table('users')->where('email', $validated['email'])->first();
-User::where('email', $validated['email'])->first();</pre>
-          <span class="framework-label bad">BAD!</span>
-<pre>$users = DB::select("SELECT * FROM users WHERE email = '{$_GET['email']}'");</pre>
-        </div>
-        <div class="case-block"><span class="framework-label ci">CodeIgniter</span>
-          <span class="framework-label good">SAFE</span>
-<pre>$email = $this->request->getVar('email');
-$user = $db->table('users')->getWhere(['email' => $email])->getRow();</pre>
-          <span class="framework-label bad">BAD!</span>
-<pre>$email = $_GET['email'];
-$query = $this->db->query("SELECT * FROM users WHERE email = '$email'");</pre>
-        </div>
+<!-- SLIDE PENJELASAN IDOR -->
+<div class="slide" id="slide-4" tabindex="0">
+  <div class="panel">
+    <h2>IDOR<br>(Insecure Direct Object Reference)</h2>
+    <ul>
+      <li><b>IDOR</b> adalah celah di mana aplikasi mengizinkan akses atau manipulasi data sensitif milik user lain hanya dengan menebak atau mengganti ID di URL atau parameter.</li>
+      <li>Contoh: User A bisa mengakses /profile/2 lalu mengubah 2 menjadi 3 di URL agar mendapat data milik User B.</li>
+      <li>Biasanya terjadi karena aplikasi tidak memvalidasi bahwa objek/data memang milik user yang sudah login.</li>
+      <li>IDOR sangat berbahaya: dapat mencuri data, mengambil dokumen, mengubah data sensitif, hingga men-delete data user lain!</li>
+    </ul>
+    <div class="card">
+      <b>Kunci pencegahan:</b><br>
+      <span style="color:#61e396;">Server harus selalu memeriksa otorisasi/ownership data setiap akses/modifikasi objek!</span>
+    </div>
+    <span class="slide-num"></span>
+  </div>
+</div>
+
+<!-- SLIDE FLOW IDOR -->
+<div class="slide" id="slide-5" tabindex="0">
+  <div class="panel">
+    <h2></h2>
+    <img src="./idor.png" alt="Flow Alur Serangan IDOR" style="width:100%; height:auto;">
+    <p style="text-align:center;">Gambar di atas menunjukkan alur serangan IDOR, mulai dari permintaan pengguna hingga akses data yang tidak sah.</p>
+    <span class="slide-num"></span>
+  </div>
+</div>
+
+<!-- SLIDE 5: Studi Kasus IDOR -->
+<div class="slide" id="slide-4" tabindex="0">
+  <div class="panel">
+    <h2>Studi Kasus IDOR (Insecure Direct Object Reference)</h2>
+    <div class="case-flex">
+      <div class="case-block"><span class="framework-label">Laravel</span>
+        <span class="framework-label bad">BAD!</span>
+<pre>
+// ProfileController.php
+public function show($id) {
+  // Siapapun bisa akses /profile/10
+  $user = User::find($id);
+  return view('profile', ['user' => $user]);
+}
+// Tidak ada pembatasan! User B bisa buka profil User A dengan id A.
+</pre>
+        <span class="framework-label good">SAFE</span>
+<pre>
+// Pastikan harus user-nya sendiri
+public function show(Request $request, $id) {
+  if ($request->user()->id != $id) {
+    abort(403, 'Unauthorized');
+  }
+  $user = User::find($id);
+  return view('profile', ['user' => $user]);
+}
+</pre>
       </div>
-      <div class="card">Query Builder/Eloquent + validasi input, JANGAN raw SQL!</div>
-      <span class="slide-num">5 / 15</span>
+      <div class="case-block"><span class="framework-label ci">CodeIgniter</span>
+        <span class="framework-label bad">BAD!</span>
+<pre>
+// Profile.php Controller
+public function detail($id) {
+  // Siapa saja bisa akses /profile/10 atau /profile/99
+  $user = $this->userModel->find($id);
+  return view('profile', ['user' => $user]);
+}
+// Tidak ada verifikasi user login
+</pre>
+        <span class="framework-label good">SAFE</span>
+<pre>
+// Batasi hanya user yang benar
+public function detail($id) {
+  $user = $this->userModel->find($id);
+  if ($user['id'] != session()->get('user_id')) {
+    throw \CodeIgniter\Exceptions\PageForbiddenException::forPageForbidden();
+  }
+  return view('profile', ['user' => $user]);
+}
+</pre>
+      </div>
+    </div>
+    <div class="card">
+      <b>IDOR = User bisa akses/memodifikasi data milik user lain cukup dengan menebak ID di URL.</b><br>
+      Solusi: <b>Selalu pastikan data hanya milik user yang sedang login!</b>
+    </div>
+    <span class="slide-num"></span>
+  </div>
+</div>
+<!-- SLIDE PENJELASAN CSRF -->
+<div class="slide" id="slide-csrf-explanation" tabindex="0">
+  <div class="panel">
+    <h2>CSRF<br>(Cross-Site Request Forgery)</h2>
+    <ul>
+      <li><b>CSRF</b> adalah serangan dimana penyerang memanfaatkan kepercayaan browser pengguna yang sudah login untuk melakukan aksi tanpa izin pengguna.</li>
+      <li>Contohnya: pengguna login lalu secara tidak sadar melakukan aksi seperti ubah password, kirim data, atau transaksi melalui form yang dipicu situs jahat.</li>
+      <li>Serangan ini mengeksploitasi kurangnya verifikasi bahwa aksi itu disetujui pengguna sendiri.</li>
+      <li>CSRF biasanya disebabkan karena aplikasi tidak menambahkan token keamanan unik di form.</li>
+    </ul>
+    <div class="card">
+      <b>Untuk mencegah CSRF:</b><br>
+      Semua form harus memiliki token acak yang dikirim bersama form dan divalidasi di server sebelum proses aksi.
+    </div>
+    <span class="slide-num"></span>
+  </div>
+</div>
+
+
+<!-- SLIDE FLOW CSRF -->
+<div class="slide" id="slide-csrf-flow" tabindex="0">
+  <div class="panel">
+    <h2>Alur Serangan CSRF (Cross-Site Request Forgery)</h2>
+    <img src="./csrf.jpg" alt="Diagram alur serangan CSRF yang menunjukkan browser pengguna yang sedang login mengirimkan request berbahaya yang dibuat oleh situs penyerang ke situs asli" style="width:100%; height:auto; border-radius:8px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);" />
+    <p style="text-align:center; color:#b0b7ca; font-size:1.1rem; margin-top:1rem;">
+      Flow ini menjelaskan bagaimana situs penyerang dapat membuat permintaan berbahaya yang terlihat sah dari browser pengguna yang sudah login ke situs asli, tanpa sepengetahuan mereka.
+    </p>
+    <span class="slide-num"></span>
     </div>
   </div>
+
   <div class="slide" id="slide-5" tabindex="0">
     <div class="panel">
       <h2>Studi Kasus CSRF Protection</h2>
@@ -282,9 +406,29 @@ $query = $this->db->query("SELECT * FROM users WHERE email = '$email'");</pre>
         </div>
       </div>
       <div class="card">Laravel: @csrf — CI: csrf_field() — <b>Wajib semua form penting!</b></div>
-      <span class="slide-num">6 / 15</span>
+      <span class="slide-num"></span>
     </div>
   </div>
+
+<!-- SLIDE PENJELASAN SESSION & COOKIE -->
+<div class="slide" id="slide-session-cookie-explanation" tabindex="0">
+  <div class="panel">
+    <h2>Serangan Session &amp; Cookie</h2>
+    <ul>
+      <li><b>Session Hijacking:</b> Penyerang mencuri session ID pengguna untuk mengakses akun tanpa izin.</li>
+      <li><b>Cookie Theft:</b> Cookie penyimpanan informasi login dapat dicuri via XSS atau sniffing jika tidak aman.</li>
+      <li>Penggunaan cookie tanpa perlindungan <code>HttpOnly</code> dan <code>Secure</code> meningkatkan risiko pencurian data.</li>
+      <li>Serangan ini memungkinkan peretas berpura-pura menjadi pengguna asli dan mencuri data sensitif.</li>
+    </ul>
+    <div class="card">
+      <b>Untuk melindungi session &amp; cookie:</b><br>
+      Gunakan atribut <code>HttpOnly</code>, <code>Secure</code>, dan <code>SameSite</code>. Selalu invalidasi session pada logout dan batasi waktu kadaluarsa session.
+    </div>
+    <span class="slide-num"></span>
+  </div>
+</div>
+
+
   <div class="slide" id="slide-6" tabindex="0">
     <div class="panel">
       <h2>Studi Kasus Session &amp; Cookie</h2>
@@ -303,7 +447,7 @@ session()->destroy();</pre>
         </div>
       </div>
       <div class="card">Cookie secure, hapus session di logout, XSS/Session hijack = nyata!</div>
-      <span class="slide-num">7 / 15</span>
+      <span class="slide-num"></span>
     </div>
   </div>
   <div class="slide" id="slide-7" tabindex="0">
@@ -326,7 +470,32 @@ if ($file->isValid() && !$file->hasMoved() &&
         </div>
       </div>
       <div class="card">Validasi tipe/ukuran, simpan di folder non-public, upload shell dilarang!</div>
-      <span class="slide-num">8 / 15</span>
+      <span class="slide-num"></span>
+    </div>
+  </div>
+    <div class="slide" id="slide-10" tabindex="0">
+    <div class="panel">
+      <h2>.env &amp; Credential Management</h2>
+      <div class="case-flex">
+        <div class="case-block"><span class="framework-label">.env</span>
+<pre>DB_HOST=localhost
+DB_USER=myuser
+DB_PASS=mysecret
+
+// Laravel
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();</pre>
+        </div>
+        <div class="case-block"><span class="framework-label">Tips</span>
+          <ul>
+            <li>.env wajib di .gitignore</li>
+            <li>Jangan pernah upload credential ke repo</li>
+            <li>File .env dan /.git harus tidak bisa diakses publik</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">Credential = kunci web, jangan bocor/env public!</div>
+      <span class="slide-num">1</span>
     </div>
   </div>
   <div class="slide" id="slide-8" tabindex="0">
@@ -360,7 +529,7 @@ Header set Content-Security-Policy "default-src 'self';"
         </div>
       </div>
       <div class="card">Akses /.git/.env = harus 403 Forbidden (block public)!</div>
-      <span class="slide-num">9 / 15</span>
+      <span class="slide-num"></span>
     </div>
   </div>
   <div class="slide" id="slide-9" tabindex="0">
@@ -393,34 +562,10 @@ $ chown -R www-data:www-data .
         </div>
       </div>
       <div class="card">Struktur folder, permission, block file sensitif, deployment = <b>wajib benar!</b></div>
-      <span class="slide-num">10 / 15</span>
+      <span class="slide-num">1</span>
     </div>
   </div>
-  <div class="slide" id="slide-10" tabindex="0">
-    <div class="panel">
-      <h2>.env &amp; Credential Management</h2>
-      <div class="case-flex">
-        <div class="case-block"><span class="framework-label">.env</span>
-<pre>DB_HOST=localhost
-DB_USER=myuser
-DB_PASS=mysecret
 
-// Laravel
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();</pre>
-        </div>
-        <div class="case-block"><span class="framework-label">Tips</span>
-          <ul>
-            <li>.env wajib di .gitignore</li>
-            <li>Jangan pernah upload credential ke repo</li>
-            <li>File .env dan /.git harus tidak bisa diakses publik</li>
-          </ul>
-        </div>
-      </div>
-      <div class="card">Credential = kunci web, jangan bocor/env public!</div>
-      <span class="slide-num">11 / 15</span>
-    </div>
-  </div>
   <div class="slide" id="slide-11" tabindex="0">
     <div class="panel">
       <h2>Backup &amp; Log Monitoring</h2>
@@ -439,7 +584,7 @@ $dotenv->load();</pre>
         </div>
       </div>
       <div class="card">Backup terjadwal, audit log, audit keamanan = pondasi anti disaster</div>
-      <span class="slide-num">12 / 15</span>
+      <span class="slide-num">1</span>
     </div>
   </div>
   <div class="slide" id="slide-12" tabindex="0">
@@ -460,11 +605,11 @@ composer audit</pre>
         </div>
       </div>
       <div class="card">Dependency lama = pintu hacker selalu terbuka!</div>
-      <span class="slide-num">13 / 15</span>
+      <span class="slide-num">1</span>
     </div>
   </div>
   <div class="slide" id="slide-13" tabindex="0">
-    <div class="panel">
+    <div class="panel"> 
       <h2>Hacked → Hardened</h2>
       <ul>
         <li>XSS, SQLi, upload shell di dev.
@@ -486,21 +631,22 @@ hacker sebenarnya.
         <li>Fix dengan materi best-practice. Tes ulang sampai aman.</li>
       </ul>
       <div class="card">Audit, perbaiki, audit lagi — aplikasi jadi kuat.</div>
-      <span class="slide-num">14 / 15</span>
+      <span class="slide-num">1</span>
     </div>
   </div>
 
   <div class="slide" id="slide-15" tabindex="0">
     <div class="panel">
-      <h2>Penutup &amp; Takeaways</h2>
+      <h2>Penutup</h2>
       <ul>
         <li>Nyaman  != Aman!!</li>
+        <li>Secure By Design (YES), Secure by Accident (NO) </li>
         <li>Security = proses panjang dan terus-menerus</li>
         <li>Audit, patch, dan monitor aplikasi Anda</li>
         <li>Stay curious, stay secure! 🔒</li>
       </ul>
       <div class="card">Terima kasih — sampai jumpa di kesempatan selanjutnya!</div>
-      <span class="slide-num">15 / 15</span>
+      <span class="slide-num">1</span>
     </div>
   </div>
 
