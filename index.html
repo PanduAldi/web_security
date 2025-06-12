@@ -100,9 +100,19 @@
     }
     .slide-nav {
       position: absolute; left: 0; right: 0; bottom: 2.2rem;
-      display: flex; justify-content: center; gap: 100.4em;
+      display: flex; justify-content: center; gap: 70.4em;
       z-index: 10; pointer-events:none;
     }
+
+@media (max-width: 767px) {
+    .slide-nav {
+      position: absolute; left: 0; right: 0; bottom: 2.2rem;
+      display: flex; justify-content: center; gap: 1.4em;
+      z-index: 10; pointer-events:none;
+    }
+
+}
+
     .slide-nav-btn {
       background: var(--cta);
       color: #fff;
