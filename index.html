@@ -170,7 +170,7 @@
   <div class="slide active" id="slide-0" tabindex="0">
     <div class="panel">
       <h1>Web Security:<br>Secure Coding &amp; Deployment<br> </h1>
-      <div class="desc"> — <strong>[ Pandu Aja ]</strong> —</div>
+      <div class="desc"> — <strong>[ PANDU ALDI PRATAMA ]</strong> —</div>
       <div class="card" style="font-weight:600;">
         Brebes, 12 Juni 2025
       </div>
@@ -513,6 +513,40 @@ session()->destroy();</pre>
       <span class="slide-num"></span>
     </div>
   </div>
+
+
+<!-- overview file upload vuln -->
+ <!-- OVERVIEW FILE UPLOAD VULNERABILITY -->
+<div class="slide" id="slide-8" tabindex="0">
+  <div class="panel">
+    <h2>File Upload Vulnerability</h2>
+    <ul>
+      <li><b>File Upload Vulnerability</b> adalah celah keamanan saat aplikasi mengizinkan pengguna mengupload file tanpa validasi/kontrol memadai.</li>
+      <li>Penyerang dapat mengupload file berbahaya seperti <span style="color:#ff9892;">shell script (.php)</span>, malware, atau dokumen yang bisa dieksekusi.</li>
+      <li>Dampak:
+        <ul>
+          <li>Server takeover (webshell/backdoor berjalan di server)</li>
+          <li>Mengubah/menghapus/mencuri data penting</li>
+          <li>Phishing atau defacement lewat upload gambar/html berbahaya</li>
+        </ul>
+      </li>
+      <li>Biasa terjadi karena:
+        <ul>
+          <li>Tidak membatasi ekstensi/tipe file (semua file lolos)</li>
+          <li>File disimpan di folder public langsung dapat diakses/eksekusi</li>
+          <li>Tanpa limit ukuran/upload, mudah DoS/abus</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="card">
+      Gunakan <b>whitelist ekstensi & tipe</b>, validasi file size, dan simpan upload di folder non-public. 
+      <br>Kombinasi validasi & permission = kunci upload secure!
+    </div>
+    <span class="slide-num">9 / 17</span>
+  </div>
+</div>
+
+
   <div class="slide" id="slide-7" tabindex="0">
     <div class="panel">
       <h2>Studi Kasus Upload File</h2>
