@@ -159,7 +159,7 @@
   <!-- 1: JUDUL -->
   <div class="slide active" id="slide-0" tabindex="0">
     <div class="panel">
-      <h1>Web Security:<br>Secure Coding &amp; Deployment<br> pada PHP </h1>
+      <h1>Web Security:<br>Secure Coding &amp; Deployment<br> </h1>
       <div class="desc"> — <strong>[ Pandu Aja ]</strong> —</div>
       <div class="card" style="font-weight:600;">
         Brebes, 12 Juni 2025
@@ -178,6 +178,7 @@
         <li>Input/Output &amp; XSS</li>
         <li>IDOR (Insecure Direct Object Reference)</li>
         <li>CSRF</li>
+        <li>SQL Injection</li>
         <li>Session &amp; Cookie Security</li>
         <li>Upload File Aman</li>
         <li>.htaccess, Security Headers &amp; .git</li>
@@ -409,6 +410,58 @@ public function detail($id) {
       <span class="slide-num"></span>
     </div>
   </div>
+
+
+  <!-- OVERVIEW: SQL Injection -->
+<div class="slide" id="slide-5" tabindex="0">
+  <div class="panel">
+    <h2> SQL Injection (SQLi)</h2>
+    <ul>
+      <li><b>SQL Injection</b> adalah celah keamanan di mana penyerang dapat menginjeksi atau menyisipkan perintah SQL jahat ke dalam query aplikasi.</li>
+      <li>Akibat: data bocor, akun takeover, bahkan control penuh ke database/server!</li>
+      <li>Terjadi jika input user langsung digabung dalam query tanpa divalidasi/disanitasi.</li>
+      <li><b>Contoh klasik:</b> Login form dengan username/password berbasis raw SQL.<br>
+      <code>SELECT * FROM users WHERE username = '$u' AND password = '$p'</code>
+      </li>
+      <li>Payload populer: <code>' OR 1=1--</code> (selalu TRUE, login tanpa password!)</li>
+    </ul>
+    <div class="card">
+      Kunci pencegahan: <b>Jangan pernah gunakan user input mentah dalam query!</b> Gunakan Query Builder/prepared statement!
+    </div>
+    <span class="slide-num">6 / 17</span>
+  </div>
+</div>
+
+
+
+<!-- Studi Kasus SQL Injection -->
+<div class="slide" id="slide-6" tabindex="0">
+  <div class="panel">
+    <h2>Studi Kasus SQL Injection</h2>
+    <div class="case-flex">
+      <div class="case-block"><span class="framework-label">Laravel</span>
+        <span class="framework-label good">SAFE</span>
+<pre>$validated = $request->validate(['email'=>'required|email']);
+$user = DB::table('users')->where('email', $validated['email'])->first();
+User::where('email', $validated['email'])->first();</pre>
+        <span class="framework-label bad">BAD!</span>
+<pre>$users = DB::select("SELECT * FROM users WHERE email = '{$_GET['email']}'");</pre>
+      </div>
+      <div class="case-block"><span class="framework-label ci">CodeIgniter</span>
+        <span class="framework-label good">SAFE</span>
+<pre>$email = $this->request->getVar('email');
+$user = $db->table('users')->getWhere(['email' => $email])->getRow();</pre>
+        <span class="framework-label bad">BAD!</span>
+<pre>$email = $_GET['email'];
+$query = $this->db->query("SELECT * FROM users WHERE email = '$email'");</pre>
+      </div>
+    </div>
+    <div class="card">
+      Selalu gunakan Query Builder/Eloquent + validasi input, JANGAN raw SQL!
+    </div>
+    <span class="slide-num">7 / 17</span>
+  </div>
+</div>
 
 <!-- SLIDE PENJELASAN SESSION & COOKIE -->
 <div class="slide" id="slide-session-cookie-explanation" tabindex="0">
